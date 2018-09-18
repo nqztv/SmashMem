@@ -122,7 +122,35 @@ namespace SmashMem
 			set { SetProperty(ref _player2Character, value); }
 		}
 
-		private int _gameCountLimit = 3;
+        private string _port1Character = "";
+        public string Port1Character
+        {
+            get { return _port1Character; }
+            set { SetProperty(ref _port1Character, value); }
+        }
+
+        private string _port2Character = "";
+        public string Port2Character
+        {
+            get { return _port2Character; }
+            set { SetProperty(ref _port2Character, value); }
+        }
+
+        private string _port3Character = "";
+        public string Port3Character
+        {
+            get { return _port3Character; }
+            set { SetProperty(ref _port3Character, value); }
+        }
+
+        private string _port4Character = "";
+        public string Port4Character
+        {
+            get { return _port4Character; }
+            set { SetProperty(ref _port4Character, value); }
+        }
+
+        private int _gameCountLimit = 3;
 		public int GameCountLimit
 		{
 			get { return _gameCountLimit; }
@@ -133,7 +161,47 @@ namespace SmashMem
 		public bool GetCharacters
 		{
 			get { return _getCharacters; }
-			set { SetProperty(ref _getCharacters, value); }
+			set {
+                SetProperty(ref _getCharacters, value);
+                if (_getCharacters == true)
+                {
+                    if (Player1Port == Port.Port1)
+                    {
+                        Player1Character = Port1Character;
+                    }
+                    else if (Player1Port == Port.Port2)
+                    {
+                        Player1Character = Port2Character;
+                    }
+                    else if (Player1Port == Port.Port3)
+                    {
+                        Player1Character = Port3Character;
+                    }
+                    else if (Player1Port == Port.Port4)
+                    {
+                        Player1Character = Port4Character;
+                    }
+
+                    if (Player2Port == Port.Port1)
+                    {
+                        Player2Character = Port1Character;
+                    }
+                    else if (Player2Port == Port.Port2)
+                    {
+                        Player2Character = Port2Character;
+                    }
+                    else if (Player2Port == Port.Port3)
+                    {
+                        Player2Character = Port3Character;
+                    }
+                    else if (Player2Port == Port.Port4)
+                    {
+                        Player2Character = Port4Character;
+                    }
+
+                    Update();
+                }
+            }
 		}
 
 		private bool _incrementScore = true;
@@ -212,6 +280,8 @@ namespace SmashMem
 
 		private void ChangePort1Character(string obj)
 		{
+            Port1Character = obj;
+
 			if (GetCharacters)
 			{
 				if (Player1Port == Port.Port1)
@@ -230,7 +300,9 @@ namespace SmashMem
 
 		private void ChangePort2Character(string obj)
 		{
-			if (GetCharacters)
+            Port2Character = obj;
+
+            if (GetCharacters)
 			{
 				if (Player1Port == Port.Port2)
 				{
@@ -248,7 +320,9 @@ namespace SmashMem
 
 		private void ChangePort3Character(string obj)
 		{
-			if (GetCharacters)
+            Port3Character = obj;
+
+            if (GetCharacters)
 			{
 				if (Player1Port == Port.Port3)
 				{
@@ -266,7 +340,9 @@ namespace SmashMem
 
 		private void ChangePort4Character(string obj)
 		{
-			if (GetCharacters)
+            Port4Character = obj;
+
+            if (GetCharacters)
 			{
 				if (Player1Port == Port.Port4)
 				{

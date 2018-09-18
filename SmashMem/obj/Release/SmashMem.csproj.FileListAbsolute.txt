@@ -21,7 +21,6 @@ C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\bin\Release\Newtonsoft.Json.xml
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\bin\Release\Prism.xml
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\bin\Release\Prism.Unity.Wpf.xml
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\bin\Release\Prism.Wpf.xml
-C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\obj\Release\SmashMem.csprojAssemblyReference.cache
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\obj\Release\MemoryView.g.cs
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\obj\Release\ShellView.g.cs
 C:\Users\nqztv\Source\Repos\SmashMem\SmashMem\obj\Release\StreamView.g.cs
