@@ -50,7 +50,7 @@ namespace SmashMem
 			set { SetProperty(ref _interval, value); }
 		}
 
-		private string _inputCSV;
+		private string _inputCSV = "input.csv";
 		public string InputCSV
 		{
 			get { return _inputCSV; }
@@ -78,7 +78,12 @@ namespace SmashMem
 			PeekCommand = new DelegateCommand(Peek, CanPeek).ObservesProperty(() => GeckoConnected).ObservesProperty(() => InputCSV);
 			PokeCommand = new DelegateCommand(Poke, CanPoke).ObservesProperty(() => GeckoConnected).ObservesProperty(() => InputCSV);
 			ToggleAutoPeekCommand = new DelegateCommand(ToggleAutoPeek, CanToggleAutoPeek).ObservesProperty(() => GeckoConnected).ObservesProperty(() => InputCSV);
-		}
+
+            if (InputCSV != "")
+            {
+                MemoryAddresses = MemoryAddressService.CollectFromCSV(InputCSV);
+            }
+        }
 
 		private bool CanToggleConnection()
 		{
@@ -90,8 +95,8 @@ namespace SmashMem
 			if (GeckoConnected == true)
 			{
 				gecko.Connect();
-			}
-			else
+            }
+            else
 			{
 				if (cancellationTokenSource != null)
 				{

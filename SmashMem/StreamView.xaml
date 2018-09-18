@@ -103,11 +103,11 @@
 			<TextBox HorizontalAlignment="Left" Height="23" Margin="215,116,0,0" TextWrapping="Wrap" Text="{Binding GameCountLimit, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="85"/>
 			<TextBox HorizontalAlignment="Left" Height="23" Margin="10,196,0,0" TextWrapping="Wrap" Text="{Binding Player1Character, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="200"/>
 			<TextBox HorizontalAlignment="Left" Height="23" Margin="305,196,0,0" TextWrapping="Wrap" Text="{Binding Player2Character, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="200"/>
-			<CheckBox Content="Automatically get character selection" HorizontalAlignment="Left" Margin="10,224,0,0" VerticalAlignment="Top"/>
-			<CheckBox Content="Automatically decrement score on stock loss" HorizontalAlignment="Left" Margin="10,244,0,0" VerticalAlignment="Top"/>
-			<CheckBox Content="Automatically increment score on game win" HorizontalAlignment="Left" Margin="10,264,0,0" VerticalAlignment="Top"/>
-			<CheckBox Content="Fire hotkey on game start and end" HorizontalAlignment="Left" Margin="10,284,0,0" VerticalAlignment="Top"/>
-			<CheckBox Content="Fire hotkey on match start and end" HorizontalAlignment="Left" Margin="10,304,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Get character selection" IsChecked="{Binding GetCharacters, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,224,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Increment score on game win" IsChecked="{Binding IncrementScore, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,244,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Decrement score on stock loss" IsChecked="{Binding DecrementScore, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,264,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Fire hotkey on game start" IsChecked="{Binding FireGameStartHotkey, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,284,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Fire hotkey on match end" IsChecked="{Binding FireGameEndHotkey, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,304,0,0" VerticalAlignment="Top"/>
 			<ListBox SelectedValue="{Binding Player1Port}" Style="{StaticResource RadioButtonList}" ItemContainerStyle="{StaticResource SpacedRadioButtonListItem}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:Port}}}" Margin="10,113,0,0"/>
 			<ListBox SelectedValue="{Binding Player2Port}" Style="{StaticResource RadioButtonList}" ItemContainerStyle="{StaticResource SpacedRadioButtonListItem}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:Port}}}" Margin="305,113,0,0"/>
 			<ListBox SelectedItem="{Binding SelectedProcess, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Processes}" HorizontalAlignment="Left" Height="70" VerticalAlignment="Top" Width="200" Margin="305,224,0,0"/>

@@ -17,10 +17,7 @@ using System.Windows.Forms;
 
 namespace SmashMem
 {
-	//[DllImport("User32.dll")]
-	//static extern int SetForegroundWindow(IntPtr point);
-
-	
+	[TypeConverter(typeof(EnumDescriptionTypeConverter))]
 	public enum Port
 	{
 		[Description("Port 1 (Red)")]
@@ -32,41 +29,27 @@ namespace SmashMem
 		[Description("Port 4 (Green)")]
 		Port4
 	}
+
 	public class StreamViewModel : BindableBase
 	{
 		[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-		// Activate an application window.
+
 		[DllImport("USER32.DLL")]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
-		[TypeConverter(typeof(EnumDescriptionTypeConverter))]
-		private string _outputFile;
-		public string OutputFile
-		{
-			get { return _outputFile; }
-			set { SetProperty(ref _outputFile, value); }
-		}
-
-		private string _setOutputButtonText = "Set Output File";
+		private string _setOutputButtonText = @"C:\Users\nqztv\Desktop\Smash\Stream\browserfiles\assets\streamcontrol.json";
 		public string SetOutputButtonText
 		{
 			get { return _setOutputButtonText; }
 			set { SetProperty(ref _setOutputButtonText, value); }
 		}
 
-		private string _selectedProcess;
-		public string SelectedProcess
+		private string _outputFile = @"C:\Users\nqztv\Desktop\Smash\Stream\browserfiles\assets\streamcontrol.json";
+		public string OutputFile
 		{
-			get { return _selectedProcess; }
-			set { SetProperty(ref _selectedProcess, value); }
-		}
-
-		private ObservableCollection<String> _processes = new ObservableCollection<string>();
-		public ObservableCollection<String> Processes
-		{
-			get { return _processes; }
-			set { SetProperty(ref _processes, value); }
+			get { return _outputFile; }
+			set { SetProperty(ref _outputFile, value); }
 		}
 
 		private string _header1 = "Winner's R1";
@@ -76,7 +59,7 @@ namespace SmashMem
 			set { SetProperty(ref _header1, value); }
 		}
 
-		private string _header2 = "test";
+		private string _header2 = "";
 		public string Header2
 		{
 			get { return _header2; }
@@ -146,21 +129,63 @@ namespace SmashMem
 			set { SetProperty(ref _gameCountLimit, value); }
 		}
 
-		//private bool booleanTrue = true;
-		//public bool BooleanTrue
-		//{
-		//	get { return booleanTrue; }
-		//	set { SetProperty(ref booleanTrue, value); }
-		//}
+		private bool _getCharacters = true;
+		public bool GetCharacters
+		{
+			get { return _getCharacters; }
+			set { SetProperty(ref _getCharacters, value); }
+		}
 
+		private bool _incrementScore = true;
+		public bool IncrementScore
+		{
+			get { return _incrementScore; }
+			set { SetProperty(ref _incrementScore, value); }
+		}
+
+		private bool _decrementScore = false;
+		public bool DecrementScore
+		{
+			get { return _decrementScore; }
+			set { SetProperty(ref _decrementScore, value); }
+		}
+
+		private bool _fireGameStartHotkey = true;
+		public bool FireGameStartHotkey
+		{
+			get { return _fireGameStartHotkey; }
+			set { SetProperty(ref _fireGameStartHotkey, value); }
+		}
+
+		private bool _fireGameEndHotkey = true;
+		public bool FireGameEndHotkey
+		{
+			get { return _fireGameEndHotkey; }
+			set { SetProperty(ref _fireGameEndHotkey, value); }
+		}
+
+		private ObservableCollection<String> _processes = new ObservableCollection<string>();
+		public ObservableCollection<String> Processes
+		{
+			get { return _processes; }
+			set { SetProperty(ref _processes, value); }
+		}
+
+		private string _selectedProcess = @"OBS 22.0.2 (64-bit, windows) - Profile: Untitled - Scenes: Melee";
+		public string SelectedProcess
+		{
+			get { return _selectedProcess; }
+			set { SetProperty(ref _selectedProcess, value); }
+		}
+
+		public DelegateCommand SetOutputCommand { get; set; }
+		public DelegateCommand UpdateCommand { get; set; }
+		public DelegateCommand ResetScoreCommand { get; set; }
+		public DelegateCommand SwapCommand { get; set; }
 		public DelegateCommand IncrementPlayer1ScoreCommand { get; set; }
 		public DelegateCommand DecrementPlayer1ScoreCommand { get; set; }
 		public DelegateCommand IncrementPlayer2ScoreCommand { get; set; }
 		public DelegateCommand DecrementPlayer2ScoreCommand { get; set; }
-		public DelegateCommand ResetScoreCommand { get; set; }
-		public DelegateCommand UpdateCommand { get; set; }
-		public DelegateCommand SwapCommand { get; set; }
-		public DelegateCommand SetOutputCommand { get; set; }
 		public DelegateCommand ChangePort1Command { get; set; }
 		public DelegateCommand ChangePort2Command { get; set; }
 		public DelegateCommand GetProcessesCommand { get; set; }
@@ -171,199 +196,198 @@ namespace SmashMem
 			eventAggregator.GetEvent<Port2CharacterChangedEvent>().Subscribe(ChangePort2Character);
 			eventAggregator.GetEvent<Port3CharacterChangedEvent>().Subscribe(ChangePort3Character);
 			eventAggregator.GetEvent<Port4CharacterChangedEvent>().Subscribe(ChangePort4Character);
-			eventAggregator.GetEvent<GameEndEvent>().Subscribe(GameEnd);
 			eventAggregator.GetEvent<GameStartEvent>().Subscribe(GameStart);
+			eventAggregator.GetEvent<GameEndEvent>().Subscribe(GameEnd);
 
-
+			SetOutputCommand = new DelegateCommand(SetOutput, CanSetOutput);
+			UpdateCommand = new DelegateCommand(Update, CanUpdate);
+			ResetScoreCommand = new DelegateCommand(ResetScore, CanResetScore).ObservesProperty(() => Player1Score).ObservesProperty(() => Player2Score);
+			SwapCommand = new DelegateCommand(Swap, CanSwap);
 			IncrementPlayer1ScoreCommand = new DelegateCommand(IncrementPlayer1Score, CanIncrementPlayer1Score).ObservesProperty(() => Player1Score);
 			DecrementPlayer1ScoreCommand = new DelegateCommand(DecrementPlayer1Score, CanDecrementPlayer1Score).ObservesProperty(() => Player1Score);
 			IncrementPlayer2ScoreCommand = new DelegateCommand(IncrementPlayer2Score, CanIncrementPlayer2Score).ObservesProperty(() => Player2Score);
 			DecrementPlayer2ScoreCommand = new DelegateCommand(DecrementPlayer2Score, CanDecrementPlayer2Score).ObservesProperty(() => Player2Score);
-			ResetScoreCommand = new DelegateCommand(ResetScore, CanResetScore).ObservesProperty(() => Player1Score).ObservesProperty(() => Player2Score);
-			UpdateCommand = new DelegateCommand(Update, CanUpdate);
-			SwapCommand = new DelegateCommand(Swap, CanSwap);
-			SetOutputCommand = new DelegateCommand(SetOutput, CanSetOutput);
 			GetProcessesCommand = new DelegateCommand(GetProcesses, CanGetProcesses);
-			//ChangePort1Command = new DelegateCommand(ChangePort1).ObservesCanExecute(() => BooleanTrue);
-			//ChangePort2Command = new DelegateCommand(ChangePort2).ObservesCanExecute(() => BooleanTrue);
-
-		}
-
-		private void GetProcesses()
-		{
-			Process[] localAll = Process.GetProcesses();
-			string[] processNames = new string[localAll.Length];
-
-			for (var i = 0; i < localAll.Length; i++)
-			{
-				processNames[i] = localAll[i].MainWindowTitle;
-			}
-
-			processNames = processNames.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-
-			Processes = new ObservableCollection<String>(processNames);
-		}
-
-		private bool CanGetProcesses()
-		{
-			return true;
-		}
-
-		private void GameEnd(string obj)
-		{
-			if (obj == "00")
-			{
-				if (Player1Port == Port.Port1)
-				{
-					Player1Score++;
-				}
-				if (Player2Port == Port.Port1)
-				{
-					Player2Score++;
-				}
-			}
-
-			if (obj == "01")
-			{
-				if (Player1Port == Port.Port2)
-				{
-					Player1Score++;
-				}
-				if (Player2Port == Port.Port2)
-				{
-					Player2Score++;
-				}
-			}
-
-			if (obj == "02")
-			{
-				if (Player1Port == Port.Port3)
-				{
-					Player1Score++;
-				}
-				if (Player2Port == Port.Port3)
-				{
-					Player2Score++;
-				}
-			}
-
-			if (obj == "03")
-			{
-				if (Player1Port == Port.Port4)
-				{
-					Player1Score++;
-				}
-				if (Player2Port == Port.Port4)
-				{
-					Player2Score++;
-				}
-			}
-
-			if (Player1Score > (GameCountLimit / 2) || Player2Score > (GameCountLimit / 2))
-			{
-				IntPtr wordHandle = FindWindow(null, SelectedProcess);
-				if (wordHandle != IntPtr.Zero)
-				{
-					SetForegroundWindow(wordHandle);
-					System.Threading.Thread.Sleep(100);
-					SendKeys.SendWait("{F8}");
-					SendKeys.Flush();
-				}
-			}
-
-			Update();
-
-			//Header2 = obj;
-		}
-
-		private void GameStart(string obj)
-		{
-			if (Player1Score == 0 && Player2Score == 0)
-			{
-				IntPtr wordHandle = FindWindow(null, SelectedProcess);
-				if (wordHandle != IntPtr.Zero)
-				{
-					SetForegroundWindow(wordHandle);
-					System.Threading.Thread.Sleep(100);
-					SendKeys.SendWait("{F7}");
-					SendKeys.Flush();
-				}
-			}
-			//Process p = Process.GetProcessesByName("test").FirstOrDefault();
-			//Header2 = obj;
-			//Update();
 		}
 
 		private void ChangePort1Character(string obj)
 		{
-			if (Player1Port == Port.Port1)
+			if (GetCharacters)
 			{
-				Player1Character = obj;
-			}
+				if (Player1Port == Port.Port1)
+				{
+					Player1Character = obj;
+				}
 
-			if (Player2Port == Port.Port1)
-			{
-				Player2Character = obj;
-			}
+				if (Player2Port == Port.Port1)
+				{
+					Player2Character = obj;
+				}
 
-			Update();
+				Update();
+			}
 		}
 
 		private void ChangePort2Character(string obj)
 		{
-			if (Player1Port == Port.Port2)
+			if (GetCharacters)
 			{
-				Player1Character = obj;
-			}
+				if (Player1Port == Port.Port2)
+				{
+					Player1Character = obj;
+				}
 
-			if (Player2Port == Port.Port2)
-			{
-				Player2Character = obj;
-			}
+				if (Player2Port == Port.Port2)
+				{
+					Player2Character = obj;
+				}
 
-			Update();
+				Update();
+			}
 		}
 
 		private void ChangePort3Character(string obj)
 		{
-			if (Player1Port == Port.Port3)
+			if (GetCharacters)
 			{
-				Player1Character = obj;
-			}
+				if (Player1Port == Port.Port3)
+				{
+					Player1Character = obj;
+				}
 
-			if (Player2Port == Port.Port3)
-			{
-				Player2Character = obj;
-			}
+				if (Player2Port == Port.Port3)
+				{
+					Player2Character = obj;
+				}
 
-			Update();
+				Update();
+			}
 		}
 
 		private void ChangePort4Character(string obj)
 		{
-			if (Player1Port == Port.Port4)
+			if (GetCharacters)
 			{
-				Player1Character = obj;
-			}
+				if (Player1Port == Port.Port4)
+				{
+					Player1Character = obj;
+				}
 
-			if (Player2Port == Port.Port4)
-			{
-				Player2Character = obj;
-			}
+				if (Player2Port == Port.Port4)
+				{
+					Player2Character = obj;
+				}
 
-			Update();
+				Update();
+			}
 		}
 
+		private void GameStart(string obj)
+		{
+			if (FireGameStartHotkey)
+			{
+				IntPtr processHandle = FindWindow(null, SelectedProcess);
+				if (processHandle != IntPtr.Zero)
+				{
+					SetForegroundWindow(processHandle);
+					System.Threading.Thread.Sleep(15);
+					SendKeys.SendWait("{F7}");
+				}
+			}
+		}
 
-		//private void ChangePort2(Port radioSelection)
-		//{
-		//	Player2Port = radioSelection;
-		//}
+		private void GameEnd(string obj)
+		{
+			if (IncrementScore)
+			{
+				if (obj == "00")
+				{
+					if (Player1Port == Port.Port1)
+					{
+						Player1Score++;
+					}
+					if (Player2Port == Port.Port1)
+					{
+						Player2Score++;
+					}
+				}
 
-		//private void ChangePort1(Port radioSelection)
-		//{
-		//	Player1Port = radioSelection;
-		//}
+				if (obj == "01")
+				{
+					if (Player1Port == Port.Port2)
+					{
+						Player1Score++;
+					}
+					if (Player2Port == Port.Port2)
+					{
+						Player2Score++;
+					}
+				}
+
+				if (obj == "02")
+				{
+					if (Player1Port == Port.Port3)
+					{
+						Player1Score++;
+					}
+					if (Player2Port == Port.Port3)
+					{
+						Player2Score++;
+					}
+				}
+
+				if (obj == "03")
+				{
+					if (Player1Port == Port.Port4)
+					{
+						Player1Score++;
+					}
+					if (Player2Port == Port.Port4)
+					{
+						Player2Score++;
+					}
+				}
+
+				Update();
+
+				if (FireGameEndHotkey && (Player1Score > (GameCountLimit / 2) || Player2Score > (GameCountLimit / 2)))
+				{
+					IntPtr processHandle = FindWindow(null, SelectedProcess);
+					if (processHandle != IntPtr.Zero)
+					{
+						SetForegroundWindow(processHandle);
+						System.Threading.Thread.Sleep(15);
+						SendKeys.SendWait("{F8}");
+					}
+				}
+			}
+		}
+
+		private bool CanSetOutput()
+		{
+			return true;
+		}
+
+		private void SetOutput()
+		{
+			// create OpenFileDialog.
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+			// set filter for file extension and default file extension to show only csv files.
+			dlg.DefaultExt = ".json";
+			dlg.Filter = "JSON Files (*.json)|*.json";
+
+			// display OpenFileDialog.
+			Nullable<bool> result = dlg.ShowDialog();
+
+			// check if user selected a file.
+			if (result == true)
+			{
+				// update components.
+				OutputFile = dlg.FileName;
+				SetOutputButtonText = OutputFile;
+			}
+		}
 
 		private bool CanUpdate()
 		{
@@ -385,36 +409,26 @@ namespace SmashMem
 			jsonObj["player1Character"] = Player1Character;
 			jsonObj["player2Character"] = Player2Character;
 			string output = JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+
+			if (Header1.Contains("Finals") || Header1.Contains("Loser's Semis"))
+			{
+				GameCountLimit = 5;
+			}
+
 			File.WriteAllText(OutputFile, output);
 		}
 
-		private bool CanSetOutput()
+		private bool CanResetScore()
 		{
-			return true;
+			return !(Player1Score == 0 && Player2Score == 0);
 		}
 
-		private void SetOutput()
+		private void ResetScore()
 		{
-			// create OpenFileDialog.
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+			Player1Score = 0;
+			Player2Score = 0;
 
-			// set filter for file extension and default file extension to show only csv files.
-			dlg.DefaultExt = ".json";
-			dlg.Filter = "JSON Files (*.json)|*.json";
-
-			// display OpenFileDialog.
-			Nullable<bool> result = dlg.ShowDialog();
-
-			// check if user selected a file. 
-			if (result == true)
-			{
-				// update components.
-				OutputFile = dlg.FileName;
-				SetOutputButtonText = OutputFile;
-				//MemoryAddresses = MemoryAddressService.CollectFromCSV(InputCSV);
-				//dbgMemoryAddresses.ItemsSource = memoryAddresses;
-				//txtStatus.Text = inputCSV + " opened as input.";
-			}
+			Update();
 		}
 
 		private bool CanSwap()
@@ -431,37 +445,14 @@ namespace SmashMem
 			Update();
 		}
 
-		private bool CanResetScore()
+		private bool CanIncrementPlayer1Score()
 		{
-			return !(Player1Score == 0 && Player2Score == 0);
+			return Player1Score < 99;
 		}
 
-		private void ResetScore()
+		private void IncrementPlayer1Score()
 		{
-			Player1Score = 0;
-			Player2Score = 0;
-
-			Update();
-		}
-
-		private bool CanDecrementPlayer2Score()
-		{
-			return Player2Score > 0;
-		}
-
-		private void DecrementPlayer2Score()
-		{
-			Player2Score--;
-		}
-
-		private bool CanIncrementPlayer2Score()
-		{
-			return Player2Score < 99;
-		}
-
-		private void IncrementPlayer2Score()
-		{
-			Player2Score++;
+			Player1Score++;
 		}
 
 		private bool CanDecrementPlayer1Score()
@@ -474,14 +465,44 @@ namespace SmashMem
 			Player1Score--;
 		}
 
-		private bool CanIncrementPlayer1Score()
+		private bool CanIncrementPlayer2Score()
 		{
-			return Player1Score < 99;
+			return Player2Score < 99;
 		}
 
-		private void IncrementPlayer1Score()
+		private void IncrementPlayer2Score()
 		{
-			Player1Score++;
+			Player2Score++;
+		}
+
+		private bool CanDecrementPlayer2Score()
+		{
+			return Player2Score > 0;
+		}
+
+		private void DecrementPlayer2Score()
+		{
+			Player2Score--;
+		}
+
+		private bool CanGetProcesses()
+		{
+			return true;
+		}
+
+		private void GetProcesses()
+		{
+			Process[] localAll = Process.GetProcesses();
+			string[] processNames = new string[localAll.Length];
+
+			for (var i = 0; i < localAll.Length; i++)
+			{
+				processNames[i] = localAll[i].MainWindowTitle;
+			}
+
+			processNames = processNames.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+			Processes = new ObservableCollection<String>(processNames);
 		}
 	}
 }
